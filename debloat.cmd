@@ -6,7 +6,7 @@ echo  ******************************************************************
 echo.
 
 goto check_permissions
-
+setlocal
 :check_permissions
     pushd %~dp0
     net session >nul 2>&1
@@ -49,14 +49,13 @@ goto check_permissions
         if %errorlevel% neq 0 ( goto error )
 
         call ".\utils\message.cmd" "[!] Ejecucion Finalizada." "success"
-        timeout /t 5
-        exit 
-
+        exit /b
     ) else (
+        if %errorlevel% neq 0 ( call :error "Permisos Insuficientes" %errorlevel% )
         call ".\utils\message.cmd" "[Error] Permisos actuales insuficientes!." "error"
-        timeout
-        if %errorlevel% neq 0 ( goto error )
+        exit /b
     )
+endlocal
 
 :error
-    echo [%time:~0,8%] Semething when wrong! - Error Code: %errorlevel% >> debloat_log.txt 2>&1
+    echo [%time:~0,8%] %~1 - Error Code: %~2 >> debloat_log.txt 2>&1
